@@ -19,6 +19,14 @@
   margin: 0 0 24px 0;
 }
 
+/* Guest Actions - Preview & Download Buttons */
+.guestActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
 /* Preview Button - Top */
 .previewButtonTop {
   display: flex;

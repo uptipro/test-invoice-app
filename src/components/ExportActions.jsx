@@ -217,21 +217,44 @@ export default function ExportActions({
         </p>
 
         {isGuest && (
-          <div className={styles.guestPrompt}>
-            <div className={styles.guestIcon}>🔐</div>
-            <h4 className={styles.guestTitle}>Sign in to Save & Export</h4>
-            <p className={styles.guestText}>
-              Create an account to save your invoices, export to Excel, and access all features.
-            </p>
-            <div className={styles.guestButtons}>
-              <button className={styles.guestPrimary} onClick={onLogin}>
-                Sign In / Sign Up
+          <>
+            {/* Preview & Download Buttons for Guests */}
+            <div className={styles.guestActions}>
+              <button
+                className={styles.primaryButton}
+                onClick={handlePreviewPdf}
+                disabled={!hasRequiredFields}
+              >
+                <Eye size={18} />
+                Preview & Download
               </button>
-              <button className={styles.guestSecondary} onClick={onClear}>
-                Clear Form
+
+              <button
+                className={styles.secondaryButton}
+                onClick={handleDownloadPdf}
+                disabled={!hasRequiredFields}
+              >
+                <Download size={18} />
+                Download PDF
               </button>
             </div>
-          </div>
+
+            <div className={styles.guestPrompt}>
+              <div className={styles.guestIcon}>🔐</div>
+              <h4 className={styles.guestTitle}>Sign in to Save & Export</h4>
+              <p className={styles.guestText}>
+                Create an account to save your invoices, export to Excel, and access all features.
+              </p>
+              <div className={styles.guestButtons}>
+                <button className={styles.guestPrimary} onClick={onLogin}>
+                  Sign In / Sign Up
+                </button>
+                <button className={styles.guestSecondary} onClick={onClear}>
+                  Clear Form
+                </button>
+              </div>
+            </div>
+          </>
         )}
 
         {!isGuest && (
