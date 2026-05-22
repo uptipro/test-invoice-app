@@ -76,6 +76,11 @@ export default function ExportActions({
     setPreviewOpen(true);
   };
 
+  const handleDownloadDirect = () => {
+    const pdfData = buildPdfData();
+    downloadInvoicePdf(template, pdfData);
+  };
+
   const handleConfirmDownload = async ({ privacyPolicyAccepted }) => {
     const newInternalNumber = generateInvoiceNumber();
     onInvoiceNumberUsed?.(newInternalNumber);
@@ -226,12 +231,12 @@ export default function ExportActions({
                 disabled={!hasRequiredFields}
               >
                 <Eye size={18} />
-                Preview & Download
+                Preview Invoice
               </button>
 
               <button
                 className={styles.secondaryButton}
-                onClick={handleDownloadPdf}
+                onClick={handleDownloadDirect}
                 disabled={!hasRequiredFields}
               >
                 <Download size={18} />
