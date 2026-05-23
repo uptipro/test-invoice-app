@@ -86,6 +86,7 @@ export default function Onboarding({ onComplete, currentPage = "builder" }) {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
+      document.body.style.overflow = "";
       onComplete();
     }
   };
@@ -97,12 +98,21 @@ export default function Onboarding({ onComplete, currentPage = "builder" }) {
   };
 
   const handleSkip = () => {
+    document.body.style.overflow = "";
     onComplete();
   };
 
   const handlePause = () => {
     setIsPaused(!isPaused);
   };
+
+  useEffect(() => {
+    // Prevent scrolling while tutorial is active
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
 
   useEffect(() => {
     const handleKeyPress = (e) => {

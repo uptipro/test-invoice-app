@@ -35,7 +35,11 @@ function App() {
     }
   });
 
-  const [page, setPage] = useState("landing");
+  const [page, setPage] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("id") || params.get("request_id") || params.get("rfq")) return "main";
+    return "landing";
+  });
   const [isGuestMode, setIsGuestMode] = useState(false);
   const [receivedInvoiceId, setReceivedInvoiceId] = useState(null);
   const [loadedInvoiceStatus, setLoadedInvoiceStatus] = useState(null);
@@ -154,37 +158,6 @@ function App() {
     if (rfqParam) {
       setRfqId(rfqParam);
       setPage("rfq");
-    }
-    
-    // Handle negotiation data from NegotiationDetailsPage
-    const negotiationId = params.get('negotiation_id');
-    if (negotiationId) {
-      const invoiceNumber = params.get('invoice_number');
-      const clientName = params.get('client_name');
-      const clientEmail = params.get('client_email');
-      const clientCompany = params.get('client_company');
-      const items = JSON.parse(params.get('items') || '[]');
-      
-      // Pre-fill invoice form with negotiation data
-      setInvoice((prev) => ({
-        ...prev,
-        invoice_number: invoiceNumber || prev.invoice_number,
-        clientName: clientName || prev.clientName,
-        clientCompanyName: clientCompany || prev.clientCompanyName,
-        clientEmail: clientEmail || prev.clientEmail,
-      }));
-      
-      // Create items from negotiation
-      const invoiceItems = items.map((item) => ({
-        id: item.id,
-        description: item.name,
-        quantity: item.quantity,
-        rate: item.unitPrice,
-        amount: item.quantity * item.unitPrice,
-      }));
-      setItems(invoiceItems);
-      setPage("main");
-      return;
     }
     
     // Handle request data from Requests page

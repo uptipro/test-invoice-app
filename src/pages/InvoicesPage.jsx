@@ -78,8 +78,8 @@ export default function InvoicesPage({ profile, onNavigate }) {
   }, [profile?.id]);
 
   function openInvoice(id) {
-    // Navigate to invoice builder with invoice ID to load data
-    window.location.href = `/?id=${id}`;
+    window.history.pushState({}, '', `/?id=${id}`);
+    window.dispatchEvent(new PopStateEvent('popstate'));
   }
 
   function formatAmount(amount, currency) {

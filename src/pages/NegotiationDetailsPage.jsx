@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, MessageSquare, CheckCircle2, XCircle, Clock, Send, Plus, Trash2, Edit2, Save } from "lucide-react";
+import { ArrowLeft, MessageSquare, CheckCircle2, XCircle, Clock, Send, Edit2, Eye, FileText, Download } from "lucide-react";
+import { downloadInvoicePdf, generateInvoicePdfDataUrl } from "../utils/invoiceGenerator";
 import styles from "./NegotiationDetailsPage.module.css";
 
 export default function NegotiationDetailsPage({ profile, onNavigate }) {
@@ -8,10 +9,9 @@ export default function NegotiationDetailsPage({ profile, onNavigate }) {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [itemNotes, setItemNotes] = useState({});
-  const [generalNotes, setGeneralNotes] = useState("");
   const [editableItems, setEditableItems] = useState([]);
+  const [showBuilder, setShowBuilder] = useState(false);
 
-  // Get negotiation ID from URL path
   useEffect(() => {
     const path = window.location.pathname;
     const match = path.match(/^\/negotiation\/(\d+)$/);
@@ -20,9 +20,7 @@ export default function NegotiationDetailsPage({ profile, onNavigate }) {
     }
   }, []);
 
-  // Mock data - in real app, fetch from API
   useEffect(() => {
-    // Simulate loading negotiation data
     const mockNegotiation = {
       id: 1,
       invoiceNumber: "INV-2026-003",
@@ -40,10 +38,10 @@ export default function NegotiationDetailsPage({ profile, onNavigate }) {
       ],
       createdAt: "2026-01-13T09:15:00Z",
     };
-    
+
     setNegotiation(mockNegotiation);
-    setEditableItems(mockNegotiation.items.map(item => ({ 
-      ...item, 
+    setEditableItems(mockNegotiation.items.map(item => ({
+      ...item,
       newUnitPrice: item.unitPrice,
       newTotal: item.quantity * item.unitPrice,
     })));
@@ -75,7 +73,6 @@ export default function NegotiationDetailsPage({ profile, onNavigate }) {
 
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
-    
     const message = {
       id: messages.length + 1,
       from: "owner",
@@ -84,32 +81,8 @@ export default function NegotiationDetailsPage({ profile, onNavigate }) {
       timestamp: new Date().toISOString(),
       type: "message",
     };
-    
     setMessages([...messages, message]);
     setNewMessage("");
-  };
-
-  const handleSaveItemNote = (itemId, note) => {
-    setItemNotes({ ...itemNotes, [itemId]: note });
-  };
-
-  const handleSaveGeneralNote = () => {
-    // Save general notes
-    console.log("Saving general notes:", generalNotes);
-  };
-
-  const handleAcceptOffer = () => {
-    if (confirm("Accept this offer?")) {
-      // Update negotiation status
-      console.log("Offer accepted");
-    }
-  };
-
-  const handleRejectOffer = () => {
-    if (confirm("Reject this offer?")) {
-      // Update negotiation status
-      console.log("Offer rejected");
-    }
   };
 
   const handleItemPriceChange = (itemId, field, value) => {
@@ -128,41 +101,22 @@ export default function NegotiationDetailsPage({ profile, onNavigate }) {
     setItemNotes({ ...itemNotes, [itemId]: note });
   };
 
-  const handleItemCounterOffer = (itemId) => {
-    const item = editableItems.find(i => i.id === itemId);
-    if (!item) return;
-    
-    if (item.newUnitPrice <= 0) {
-      alert("Please enter a valid unit price");
+  const handleCollectiveCounter = () => {
+    const invalidItem = editableItems.find(i => i.newUnitPrice <= 0);
+    if (invalidItem) {
+      alert(`Please enter a valid unit price for "${invalidItem.name}"`);
       return;
     }
-    
-    const confirmMsg = `Submit counter offer for ${item.name}?\n\nOriginal: ₦${item.originalPrice.toLocaleString()}\nYour Price: ₦${item.newTotal.toLocaleString()}`;
-    if (!confirm(confirmMsg)) return;
-    
-    // Update the item's unit price to the new price
-    setEditableItems(prev => prev.map(i => {
-      if (i.id !== itemId) return i;
-      return { ...i, unitPrice: i.newUnitPrice, originalPrice: i.unitPrice };
-    }));
-    
-    console.log(`Counter offer submitted for item ${itemId}: ₦${item.newTotal.toLocaleString()}`);
-  };
 
-  const handleEditInvoice = () => {
-    // Navigate to invoice builder with negotiation data
-    const params = new URLSearchParams();
-    params.set('negotiation_id', negotiation.id);
-    params.set('invoice_number', negotiation.invoiceNumber);
-    params.set('client_name', negotiation.client.name);
-    params.set('client_email', negotiation.client.email);
-    params.set('client_company', negotiation.client.company);
-    params.set('items', JSON.stringify(editableItems));
-    window.location.href = `/?${params.toString()}`;
+    const totalNew = editableItems.reduce((sum, i) => sum + i.newTotal, 0);
+    const confirmMsg = `Submit collective counter offer?\n\nOriginal: ₦${negotiation.originalAmount.toLocaleString()}\nCurrent Offer: ₦${negotiation.currentOffer.toLocaleString()}\nYour Counter: ₦${totalNew.toLocaleString()}`;
+    if (!confirm(confirmMsg)) return;
+
+    console.log(`Collective counter offer submitted: ₦${totalNew.toLocaleString()}`);
   };
 
   const calculateTotal = () => {
-    return editableItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+    return editableItems.reduce((sum, item) => sum + item.newTotal, 0);
   };
 
   if (!negotiation) {
@@ -181,6 +135,30 @@ export default function NegotiationDetailsPage({ profile, onNavigate }) {
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  const handleDownloadPdf = () => {
+    const pdfData = {
+      companyName: profile?.name || "",
+      companyAddress: "",
+      companyEmail: profile?.email || "",
+      clientName: negotiation.client.name,
+      clientCompanyName: negotiation.client.company,
+      invoiceNumber: negotiation.invoiceNumber,
+      items: editableItems.map(i => ({
+        description: i.name,
+        quantity: i.quantity,
+        unitPrice: i.newUnitPrice,
+        amount: i.newTotal,
+      })),
+      subtotal: calculateTotal(),
+      total: calculateTotal(),
+      currency: "NGN",
+      notes: "",
+      taxRate: 0,
+      tax: 0,
+    };
+    downloadInvoicePdf("template-1", pdfData);
   };
 
   return (
@@ -204,16 +182,20 @@ export default function NegotiationDetailsPage({ profile, onNavigate }) {
       </div>
 
       <div className={styles.content}>
-        {/* Left Column - Negotiation Thread */}
+        {/* Left Column - Offer Summary + Items + Builder */}
         <div className={styles.leftColumn}>
           {/* Offer Summary */}
           <div className={styles.offerSummary}>
+            <h3 className={styles.cardTitle}>
+              <FileText size={20} />
+              Offer Summary
+            </h3>
             <div className={styles.offerRow}>
               <span className={styles.offerLabel}>Original Amount:</span>
               <span className={styles.offerValue}>₦{negotiation.originalAmount.toLocaleString()}</span>
             </div>
             <div className={styles.offerRow}>
-              <span className={styles.offerLabel}>Current Offer:</span>
+              <span className={styles.offerLabel}>Client Offer:</span>
               <span className={styles.offerValueHighlight}>₦{negotiation.currentOffer.toLocaleString()}</span>
             </div>
             <div className={styles.offerRow}>
@@ -221,38 +203,183 @@ export default function NegotiationDetailsPage({ profile, onNavigate }) {
               <span className={styles.offerValueHighlight}>₦{calculateTotal().toLocaleString()}</span>
             </div>
             <div className={styles.offerRow}>
-              <span className={styles.offerLabel}>Difference:</span>
+              <span className={styles.offerLabel}>Difference from Original:</span>
               <span className={styles.offerValueNegative}>
-                -₦{(negotiation.originalAmount - negotiation.currentOffer).toLocaleString()}
+                -₦{(negotiation.originalAmount - Math.min(negotiation.currentOffer, calculateTotal())).toLocaleString()}
               </span>
             </div>
-            
+
             <div className={styles.actionButtons}>
-              <button className={styles.acceptButton} onClick={handleAcceptOffer}>
+              <button className={styles.acceptButton} onClick={() => confirm("Accept offer?") && console.log("Accepted")}>
                 <CheckCircle2 size={18} />
                 Accept Offer
               </button>
-              <button className={styles.rejectButton} onClick={handleRejectOffer}>
+              <button className={styles.rejectButton} onClick={() => confirm("Reject offer?") && console.log("Rejected")}>
                 <XCircle size={18} />
                 Reject
               </button>
             </div>
-
-            {/* Edit Invoice Button */}
-            <button className={styles.editInvoiceButton} onClick={handleEditInvoice}>
-              <Edit2 size={18} />
-              Edit Invoice in Builder
-            </button>
           </div>
 
-          {/* Messages Thread - Commented out for now (no backend support yet) */}
-          {false && (
+          {/* Invoice Items - Editable */}
+          <div className={styles.itemsCard}>
+            <h3 className={styles.cardTitle}>
+              <Edit2 size={20} />
+              Negotiate Items
+            </h3>
+            <p className={styles.sectionDesc}>
+              Adjust quantities and unit prices below, then submit your collective counter offer.
+            </p>
+            {editableItems.map((item) => (
+              <div key={item.id} className={styles.itemCard}>
+                <div className={styles.itemHeader}>
+                  <h4 className={styles.itemName}>{item.name}</h4>
+                </div>
+
+                <div className={styles.previousAmountRow}>
+                  <span className={styles.previousAmountLabel}>Original:</span>
+                  <span className={styles.previousAmountValue}>₦{item.originalPrice.toLocaleString()}</span>
+                </div>
+
+                <div className={styles.itemEditRow}>
+                  <div className={styles.itemEditField}>
+                    <label className={styles.itemEditLabel}>Quantity</label>
+                    <input
+                      type="number"
+                      className={styles.itemEditInput}
+                      value={item.quantity}
+                      onChange={(e) => handleItemPriceChange(item.id, 'quantity', e.target.value)}
+                      min="1"
+                    />
+                  </div>
+                  <div className={styles.itemEditField}>
+                    <label className={styles.itemEditLabel}>Unit Price (₦)</label>
+                    <input
+                      type="number"
+                      className={styles.itemEditInput}
+                      value={item.newUnitPrice}
+                      onChange={(e) => handleItemPriceChange(item.id, 'newUnitPrice', e.target.value)}
+                      min="0"
+                      step="100"
+                    />
+                  </div>
+                </div>
+
+                <div className={styles.newTotalRow}>
+                  <span className={styles.newTotalLabel}>Your New Total:</span>
+                  <span className={styles.newTotalValue}>₦{item.newTotal.toLocaleString()}</span>
+                </div>
+
+                <div className={styles.itemNoteSection}>
+                  <label className={styles.itemNoteLabel}>
+                    <Edit2 size={14} />
+                    Notes
+                  </label>
+                  <textarea
+                    className={styles.itemNoteInput}
+                    value={itemNotes[item.id] || ""}
+                    onChange={(e) => handleItemNoteChange(item.id, e.target.value)}
+                    placeholder="Add notes about this item..."
+                    rows={2}
+                  />
+                </div>
+              </div>
+            ))}
+
+            {/* Collective Submit Button */}
+            <div className={styles.collectiveSubmit}>
+              <div className={styles.collectiveTotal}>
+                <span>Collective Counter Total:</span>
+                <strong>₦{calculateTotal().toLocaleString()}</strong>
+              </div>
+              <button className={styles.counterButton} onClick={handleCollectiveCounter}>
+                <Send size={18} />
+                Submit Collective Counter Offer
+              </button>
+            </div>
+          </div>
+
+          {/* Inline Negotiation Builder */}
+          <div className={styles.builderSection}>
+            <button
+              className={styles.toggleBuilderButton}
+              onClick={() => setShowBuilder(!showBuilder)}
+            >
+              <Eye size={18} />
+              {showBuilder ? "Hide Negotiation Invoice" : "Preview & Edit in Invoice Builder"}
+            </button>
+
+            {showBuilder && (
+              <div className={styles.builderContent}>
+                <div className={styles.builderHeader}>
+                  <h4 className={styles.cardTitle}>
+                    <FileText size={18} />
+                    Negotiation Invoice Preview
+                  </h4>
+                  <button className={styles.downloadButton} onClick={handleDownloadPdf}>
+                    <Download size={16} />
+                    Download PDF
+                  </button>
+                </div>
+
+                {/* Invoice Preview */}
+                <div className={styles.builderPreview}>
+                  <div className={styles.builderRow}>
+                    <div className={styles.builderField}>
+                      <label>Client</label>
+                      <span>{negotiation.client.name}</span>
+                    </div>
+                    <div className={styles.builderField}>
+                      <label>Company</label>
+                      <span>{negotiation.client.company}</span>
+                    </div>
+                    <div className={styles.builderField}>
+                      <label>Invoice #</label>
+                      <span>{negotiation.invoiceNumber}</span>
+                    </div>
+                  </div>
+
+                  <table className={styles.builderTable}>
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Unit Price</th>
+                        <th>Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {editableItems.map(item => (
+                        <tr key={item.id}>
+                          <td>{item.name}</td>
+                          <td>{item.quantity}</td>
+                          <td>₦{item.newUnitPrice.toLocaleString()}</td>
+                          <td>₦{item.newTotal.toLocaleString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colSpan={3}><strong>Total</strong></td>
+                        <td><strong>₦{calculateTotal().toLocaleString()}</strong></td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right Column - Conversation + Timeline */}
+        <div className={styles.rightColumn}>
+          {/* Conversation */}
           <div className={styles.messagesContainer}>
             <h3 className={styles.sectionTitle}>
               <MessageSquare size={20} />
               Conversation
             </h3>
-            
+
             <div className={styles.messages}>
               {messages.map((msg) => (
                 <div
@@ -263,10 +390,9 @@ export default function NegotiationDetailsPage({ profile, onNavigate }) {
                     <span className={styles.messageFrom}>{msg.fromName}</span>
                     <span className={styles.messageTime}>{formatTime(msg.timestamp)}</span>
                   </div>
-                  
                   {msg.type === "offer" ? (
                     <div className={styles.offerMessage}>
-                      <strong>💰 Offer:</strong> ₦{msg.amount.toLocaleString()}
+                      💰 Offer: ₦{msg.amount.toLocaleString()}
                     </div>
                   ) : (
                     <p className={styles.messageText}>{msg.message}</p>
@@ -289,105 +415,13 @@ export default function NegotiationDetailsPage({ profile, onNavigate }) {
               </button>
             </div>
           </div>
-          )}
-        </div>
 
-        {/* Right Column - Items & Notes */}
-        <div className={styles.rightColumn}>
-          {/* Invoice Items - Editable */}
-          <div className={styles.itemsCard}>
-            <h3 className={styles.cardTitle}>Invoice Items (Editable)</h3>
-            {editableItems.map((item) => (
-              <div key={item.id} className={styles.itemCard}>
-                <div className={styles.itemHeader}>
-                  <h4 className={styles.itemName}>{item.name}</h4>
-                </div>
-                
-                {/* Previous Amount Row */}
-                <div className={styles.previousAmountRow}>
-                  <span className={styles.previousAmountLabel}>Previous Amount:</span>
-                  <span className={styles.previousAmountValue}>₦{item.originalPrice.toLocaleString()}</span>
-                </div>
-                
-                <div className={styles.itemEditRow}>
-                  <div className={styles.itemEditField}>
-                    <label className={styles.itemEditLabel}>Quantity</label>
-                    <input
-                      type="number"
-                      className={styles.itemEditInput}
-                      value={item.quantity}
-                      onChange={(e) => handleItemPriceChange(item.id, 'quantity', e.target.value)}
-                      min="1"
-                    />
-                  </div>
-                  <div className={styles.itemEditField}>
-                    <label className={styles.itemEditLabel}>Your Unit Price (₦)</label>
-                    <input
-                      type="number"
-                      className={styles.itemEditInput}
-                      value={item.newUnitPrice}
-                      onChange={(e) => handleItemPriceChange(item.id, 'newUnitPrice', e.target.value)}
-                      min="0"
-                      step="100"
-                    />
-                  </div>
-                </div>
-                
-                {/* New Total Display */}
-                <div className={styles.newTotalRow}>
-                  <span className={styles.newTotalLabel}>Your Total:</span>
-                  <span className={styles.newTotalValue}>₦{item.newTotal.toLocaleString()}</span>
-                </div>
-                
-                {/* Counter Offer Button per Item */}
-                <button 
-                  className={styles.itemCounterButton}
-                  onClick={() => handleItemCounterOffer(item.id)}
-                >
-                  <Edit2 size={16} />
-                  Submit Counter for this Item
-                </button>
-                
-                {/* Item-specific Notes */}
-                <div className={styles.itemNoteSection}>
-                  <label className={styles.itemNoteLabel}>
-                    <Edit2 size={14} />
-                    Item Notes
-                  </label>
-                  <textarea
-                    className={styles.itemNoteInput}
-                    value={itemNotes[item.id] || ""}
-                    onChange={(e) => handleItemNoteChange(item.id, e.target.value)}
-                    placeholder="Add notes about this item..."
-                    rows={2}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* General Notes */}
-          <div className={styles.notesCard}>
-            <h3 className={styles.cardTitle}>
-              <MessageSquare size={20} />
-              General Notes
-            </h3>
-            <textarea
-              className={styles.generalNoteInput}
-              value={generalNotes}
-              onChange={(e) => setGeneralNotes(e.target.value)}
-              placeholder="Add general notes about this negotiation..."
-              rows={8}
-            />
-            <button className={styles.saveNotesButton} onClick={handleSaveGeneralNote}>
-              <Save size={16} />
-              Save Notes
-            </button>
-          </div>
-
-          {/* Negotiation Timeline */}
+          {/* Negotiation History Timeline */}
           <div className={styles.timelineCard}>
-            <h3 className={styles.cardTitle}>Timeline</h3>
+            <h3 className={styles.cardTitle}>
+              <Clock size={20} />
+              Negotiation History
+            </h3>
             <div className={styles.timeline}>
               <div className={styles.timelineItem}>
                 <div className={styles.timelineDot}></div>
