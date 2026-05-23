@@ -490,25 +490,6 @@ function App() {
           paddingTop: showHeader ? "100px" : "40px",
           gap: "40px",
         }}>
-          {receivedInvoiceId && (
-            <div className="loaded-invoice-banner">
-              <span>
-                Invoice {invoice.invoice_number || `#${receivedInvoiceId}`} loaded
-                — review the preview on the right or download below.
-              </span>
-              <button
-                className="back-button"
-                onClick={() => {
-                  setReceivedInvoiceId(null);
-                  setLoadedInvoiceStatus(null);
-                  window.history.replaceState({}, "", "/");
-                }}
-              >
-                ← Back to New Invoice
-              </button>
-            </div>
-          )}
-
           <div className="left-side" style={{ gap: "32px" }}>
             <InvoiceForm
               invoice={invoice}

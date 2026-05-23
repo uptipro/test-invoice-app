@@ -415,42 +415,4 @@ label {
   }
 }
 
-/* Loaded Invoice Banner */
-.loaded-invoice-banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  border: 1px solid #bbf7d0;
-  border-radius: 12px;
-  padding: 14px 20px;
-  margin-bottom: 24px;
-  color: #166534;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  box-shadow: var(--shadow-soft);
-}
 
-.loaded-invoice-banner span {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.loaded-invoice-banner .back-button {
-  background: #16a34a;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.8125rem;
-  white-space: nowrap;
-  transition: background 0.2s;
-}
-
-.loaded-invoice-banner .back-button:hover {
-  background: #15803d;
-}
