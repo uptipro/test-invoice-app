@@ -75,7 +75,7 @@
 }
 
 .progressActive {
-  background: linear-gradient(90deg, #FFFA71 0%, #1A1A2E 100%);
+  background: #FFFA71;
   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
 }
 

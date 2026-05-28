@@ -1,7 +1,7 @@
 /* Global styles - Professional & Clean */
 
 :root {
-  --font-family-base: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family-base: "Avenir", "Nunito Sans", -apple-system, BlinkMacSystemFont, sans-serif;
   --color-bg: #f8fafc;
   --color-surface: #ffffff;
   --color-grey-light: #f1f5f9;

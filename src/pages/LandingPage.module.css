@@ -199,7 +199,7 @@
 }
 
 .heroPrimary {
-  background: linear-gradient(135deg, #1A1A2E 0%, #333 100%);
+  background: #1A1A2E;
   color: #fff;
   border: none;
   border-radius: 999px;

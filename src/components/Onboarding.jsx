@@ -9,7 +9,7 @@ export default function Onboarding({ onComplete, currentPage = "builder" }) {
 
   const steps = [
     {
-      title: "Welcome to Free Invoice!",
+      title: "Welcome to sabiquot!",
       description: "Let's show you around. This quick tour takes less than 2 minutes. You'll learn how to create professional invoices effortlessly.",
       highlight: null,
       position: "center",

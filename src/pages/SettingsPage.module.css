@@ -76,9 +76,9 @@
 }
 
 .tabActive {
-  background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+  background: #1A1A2E;
   color: #fff;
-  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+  box-shadow: 0 4px 12px rgba(26, 26, 46, 0.3);
 }
 
 .tabIcon {
@@ -230,7 +230,7 @@
 }
 
 input:checked + .toggleSlider {
-  background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+  background: #1A1A2E;
 }
 
 input:checked + .toggleSlider:before {
@@ -281,7 +281,7 @@ input:checked + .toggleSlider:before {
 
 .primaryButton {
   padding: 14px 32px;
-  background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+  background: #1A1A2E;
   color: #fff;
   border: none;
   border-radius: 14px;
@@ -289,7 +289,7 @@ input:checked + .toggleSlider:before {
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s;
-  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.3);
+  box-shadow: 0 4px 16px rgba(26, 26, 46, 0.3);
   white-space: nowrap;
 }
 

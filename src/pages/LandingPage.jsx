@@ -81,8 +81,8 @@ export default function LandingPage({ onGetStarted, onLogin, invoiceCount }) {
       <nav className={styles.nav}>
         <div className={styles.navContainer}>
           <div className={styles.logo}>
-            <img src="/logo.svg" alt="Free Invoice" className={styles.logoImage} />
-            <span className={styles.logoText}>Free Invoice</span>
+            <img src="/logo.svg" alt="sabiquot" className={styles.logoImage} />
+            <span className={styles.logoText}>sabiquot</span>
           </div>
           <div className={styles.navLinks}>
             <a href="#features" className={styles.navLink}>Features</a>
@@ -99,7 +99,7 @@ export default function LandingPage({ onGetStarted, onLogin, invoiceCount }) {
               Sign In
             </button>
             <button className={styles.signUpButton} onClick={handleGetStarted}>
-              Create Free Invoice
+              Create Invoice
             </button>
           </div>
         </div>
@@ -124,7 +124,7 @@ export default function LandingPage({ onGetStarted, onLogin, invoiceCount }) {
           </p>
           <div className={styles.heroButtons}>
             <button className={styles.heroPrimary} onClick={handleGetStarted}>
-              Create Free Invoice <ArrowRight size={18} />
+              Create Invoice <ArrowRight size={18} />
             </button>
             <button className={styles.heroSecondary} onClick={onLogin}>
               Sign In
@@ -277,7 +277,7 @@ export default function LandingPage({ onGetStarted, onLogin, invoiceCount }) {
 
       {/* Footer */}
       <footer className={styles.footer}>
-        <p>© 2026 Free Invoice. Built for businesses everywhere.</p>
+        <p>© 2026 sabiquot. Built for businesses everywhere.</p>
       </footer>
     </div>
   );

@@ -100,7 +100,7 @@ export default function RegisterPage({ onRegister, onLogin }) {
     <div style={s.backdrop}>
       <div style={s.card}>
         <div style={s.logoWrap}>
-          <img src={appLogo} alt="Free Invoice" style={s.logo} />
+          <img src={appLogo} alt="sabiquot" style={s.logo} />
         </div>
 
         {/* Step indicator */}
@@ -130,7 +130,7 @@ export default function RegisterPage({ onRegister, onLogin }) {
         <p style={s.subheading}>
           {step === 1
             ? "Enter your details to get started"
-            : "Tell us how you'll use Free Invoice"}
+            : "Tell us how you'll use sabiquot"}
         </p>
 
         {error && <div style={s.errorBanner}>{error}</div>}

@@ -5,7 +5,7 @@ export default function Homepage({ onCreateInvoice, onViewInvoices, onViewReques
   return (
     <div className={styles.container}>
       <div className={styles.welcomeSection}>
-        <h1 className={styles.welcomeTitle}>Welcome to Free Invoice</h1>
+        <h1 className={styles.welcomeTitle}>Welcome to sabiquot</h1>
         <p className={styles.welcomeSubtitle}>Create professional invoices in minutes — no experience needed</p>
         
         {profile && (

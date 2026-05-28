@@ -148,7 +148,7 @@
 }
 
 .tipCard {
-  background: linear-gradient(135deg, #FFFA71 0%, #1A1A2E 100%);
+  background: #1A1A2E;
   border: 1px solid #fcd34d;
   border-radius: 14px;
   padding: 16px;

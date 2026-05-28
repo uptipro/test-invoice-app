@@ -172,7 +172,7 @@ export default function SettingsPage({ profile, onBack, onRetakeTour, onStartTut
                 <div className={styles.helpInfo}>
                   <h3 className={styles.helpTitle}>Interactive Tutorial</h3>
                   <p className={styles.helpDescription}>
-                    Retake the guided tour to learn how to use Free Invoice. 
+                    Retake the guided tour to learn how to use sabiquot. 
                     Perfect for new users or if you need a refresher.
                   </p>
                 </div>
