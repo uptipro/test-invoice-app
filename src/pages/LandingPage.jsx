@@ -115,7 +115,7 @@ export default function LandingPage({ onGetStarted, onLogin, invoiceCount }) {
             <span>Trusted by 10,000+ businesses</span>
           </div>
           <h1 className={styles.heroTitle}>
-            <span className={styles.heroRebooting}>Rebooting the</span><br />
+            Rebooting the<br />
             <span className={styles.heroTitleHighlight}>Invoice Experience.</span>
           </h1>
           <p className={styles.heroSubtitle}>
