@@ -115,7 +115,7 @@
 
 .signUpButton {
   background: #1A1A2E;
-  color: #fff;
+  color: #FFFA71;
   border: none;
   border-radius: 999px;
   padding: 10px 20px;
@@ -182,6 +182,10 @@
   color: #1A1A2E;
 }
 
+.heroRebooting {
+  color: #FFFA71;
+}
+
 .heroSubtitle {
   font-size: 1.25rem;
   color: #888;
@@ -200,7 +204,7 @@
 
 .heroPrimary {
   background: #1A1A2E;
-  color: #fff;
+  color: #FFFA71;
   border: none;
   border-radius: 999px;
   padding: 16px 32px;
@@ -613,21 +617,22 @@
 }
 
 .ctaButton {
-  background: #fff;
-  color: #1A1A2E;
-  border: none;
+  background: #1A1A2E;
+  color: #FFFA71;
+  border: 2px solid #FFFA71;
   border-radius: 999px;
   padding: 18px 48px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
-  box-shadow: 0 4px 24px rgba(255, 255, 255, 0.1);
 }
 
 .ctaButton:hover {
+  background: #FFFA71;
+  color: #1A1A2E;
   transform: translateY(-3px);
-  box-shadow: 0 8px 32px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(255, 250, 113, 0.2);
 }
 
 /* Footer */
