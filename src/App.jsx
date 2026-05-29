@@ -607,7 +607,7 @@ function App() {
   }
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div className="app-layout">
       {showSidebarNav && (
         <SidebarNav
           currentPage={page}
@@ -618,9 +618,9 @@ function App() {
         />
       )}
       <main
+        className={showSidebarNav ? "app-main app-main--sidebar" : "app-main"}
         style={{
-          flex: 1,
-          marginLeft: showSidebarNav ? "280px" : showHeader ? "0" : "0",
+          marginLeft: showSidebarNav ? "280px" : "0",
           transition: "margin-left 0.3s",
         }}
       >
