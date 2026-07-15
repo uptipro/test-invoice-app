@@ -45,6 +45,25 @@ router.patch("/:id/status", async (req, res) => {
     .single();
 
   if (error) return res.status(400).json({ error: error.message });
+
+  // Mirror status change to BuildOS ERP
+  const buildosUrl = process.env.BUILDOS_API_URL;
+  const buildosToken = process.env.BUILDOS_API_TOKEN;
+  if (buildosUrl && buildosToken && data.buildos_ref) {
+    try {
+      await fetch(`${buildosUrl}/purchase-requests/${data.buildos_ref}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${buildosToken}`,
+        },
+        body: JSON.stringify({ status }),
+      });
+    } catch (buildosErr) {
+      console.error("BuildOS status mirror failed:", buildosErr);
+    }
+  }
+
   res.json(data);
 });
 

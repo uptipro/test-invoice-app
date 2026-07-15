@@ -11,6 +11,7 @@ import notificationRoutes from "./routes/notifications.js";
 import negotiationRoutes from "./routes/negotiations.js";
 import authRoutes from "./routes/auth.js";
 import requestRoutes from "./routes/requests.js";
+import buildosRoutes from "./routes/buildos.js";
 import { sendWhatsApp } from "./whatsapp.js";
 
 const app = express();
@@ -296,6 +297,7 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/negotiate", negotiationRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/requests", requestRoutes);
+app.use("/api/buildos-webhook", buildosRoutes);
 
 async function start() {
   await initDb();
