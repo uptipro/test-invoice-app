@@ -78,6 +78,47 @@ router.patch("/:id/accept", async (req, res) => {
   } catch (notifyErr) {
     console.error("notifyProfiles failed:", notifyErr);
   }
+
+  // Push accepted invoice to BuildOS ERP
+  const buildosUrl = process.env.BUILDOS_API_URL;
+  const buildosToken = process.env.BUILDOS_API_TOKEN;
+  if (buildosUrl && buildosToken) {
+    try {
+      const [{ data: invoice }, { data: request }] = await Promise.all([
+        supabase
+          .from("invoices")
+          .select("invoice_number, currency")
+          .eq("id", neg.invoice_id)
+          .single(),
+        supabase
+          .from("requests")
+          .select("buildos_ref")
+          .eq("profile_id", neg.sender_profile_id)
+          .not("buildos_ref", "is", null)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]);
+      await fetch(`${buildosUrl}/purchase-invoices`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${buildosToken}`,
+        },
+        body: JSON.stringify({
+          supplierId: neg.sender_profile_id,
+          invoiceNo: invoice?.invoice_number,
+          amount: neg.proposed_total,
+          currency: invoice?.currency || "NGN",
+          status: "received",
+          linkedPrId: request?.buildos_ref || null,
+        }),
+      });
+    } catch (buildosErr) {
+      console.error("BuildOS sync failed:", buildosErr);
+    }
+  }
+
   res.json(neg);
 });
 
