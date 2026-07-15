@@ -56,6 +56,8 @@ export default function InvoiceForm({
           onChange={handleInput}
           inputMode="numeric"
           pattern="[0-9]*"
+          type="tel"
+          inputMode="numeric"
         />
       </label>
       <label>

@@ -762,10 +762,6 @@
     grid-template-columns: 1fr;
   }
 
-  .videoWrapper {
-    border-radius: 12px;
-  }
-
   .features {
     padding: 80px 20px;
   }
@@ -885,10 +881,6 @@
 
   .featuresGrid {
     grid-template-columns: 1fr;
-  }
-
-  .videoWrapper {
-    border-radius: 10px;
   }
 
   .features {
